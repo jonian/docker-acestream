@@ -1,0 +1,12 @@
+version: "3.0"
+services:
+  engine:
+    container_name: acestream
+    build:
+      context: .
+    ports:
+      - "6878:6878"
+      - "8621:8621"
+      - "54920:54920"
+      - "55265:55265"
+      - "62062:62062"
