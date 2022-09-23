@@ -3,7 +3,7 @@ FROM debian:stretch-slim
 
 # http://wiki.acestream.org/wiki/index.php/Download
 ENV ACE_VER 3.1.49
-ENV ACE_SRC "http://acestream.org/downloads/linux/acestream_${ACE_VER}_debian_9.9_x86_64.tar.gz"
+ENV ACE_SRC "https://download.acestream.media/linux/acestream_${ACE_VER}_debian_9.9_x86_64.tar.gz"
 ENV ACE_DIR /acestream
 ENV PATH $ACE_DIR:$PATH
 
@@ -18,6 +18,7 @@ RUN apt-get -q update                          \
         python-m2crypto                        \
         python-apsw                            \
         python-lxml                            \
+        ca-certificates                        \
         curl                                   \
  && apt-get clean                              \
  && rm -rf /var/lib/apt/lists/*                \
