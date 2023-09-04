@@ -1,22 +1,21 @@
 #!/bin/python
 
-import re
+import json
 import time
 import urllib
 
-APIURL = 'http://localhost:6878/server/api?method=get_api_access_token'
+APIURL = 'http://127.0.0.1:6878/server/api?api_version=3&method=get_api_access_token'
 
 def gettoken():
-  value = urllib.urlopen(APIURL).read()
-  match = re.search(r'[0-9a-f]{62}', value)
-  match = match.group(0) if match else None
+  value = json.loads(urllib.urlopen(APIURL).read())
+  token = value['result']['token']
   title = ' API TOKEN '
   empty = ''
 
   print(empty)
   print("#%s#" % title.center(68, '='))
   print('#%s#' % empty.center(68, ' '))
-  print('#%s#' % match.center(68, ' '))
+  print('#%s#' % token.center(68, ' '))
   print('#%s#' % empty.center(68, ' '))
   print('#%s#' % empty.center(68, '='))
   print(empty)
