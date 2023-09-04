@@ -2,12 +2,12 @@
 
 import json
 import time
-import urllib
+import urllib.request
 
 APIURL = 'http://127.0.0.1:6878/server/api?api_version=3&method=get_api_access_token'
 
 def gettoken():
-  value = json.loads(urllib.urlopen(APIURL).read())
+  value = json.loads(urllib.request.urlopen(APIURL).read())
   token = value['result']['token']
   title = ' API TOKEN '
   empty = ''

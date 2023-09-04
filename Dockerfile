@@ -1,13 +1,10 @@
 # Use debian buster (10)
-FROM python:2.7-slim-buster AS build
+FROM python:3.7-slim-buster AS build
 
 # https://docs.acestream.net/products/#linux
-ENV ACE_VER 3.1.74
-ENV ACE_SRC "https://download.acestream.media/linux/acestream_${ACE_VER}_debian_10.5_x86_64.tar.gz"
+ENV ACE_VER 3.1.75rc4
+ENV ACE_SRC "https://download.acestream.media/linux/acestream_${ACE_VER}_ubuntu_18.04_x86_64_py3.7.tar.gz"
 ENV ACE_DIR /acestream
-
-ENV APSW_VER 3.24.0-r1
-ENV APSW_SRC "https://github.com/rogerbinns/apsw/releases/download/${APSW_VER}/apsw-${APSW_VER}.zip"
 
 # Install build dependencies
 RUN apt-get -q update                          \
@@ -17,19 +14,10 @@ RUN apt-get -q update                          \
         ca-certificates                        \
         curl
 
-# Install python dependencies
-RUN pip install --user --no-cache-dir \
-        $APSW_SRC                     \
-        lxml                          \
-        requests                      \
-        isodate                       \
-        pycryptodome
-
-# Install acestream engine
-RUN mkdir $ACE_DIR && cd $ACE_DIR                     \
- && curl $ACE_SRC | tar xzf -                         \
- && rm $ACE_DIR/lib/requests-2.12.5-py2.7.egg         \
- && rm $ACE_DIR/lib/lxml-3.7.2-py2.7-linux-x86_64.egg
+# Install dependencies and acestream engine
+RUN mkdir $ACE_DIR && cd $ACE_DIR          \
+ && curl $ACE_SRC | tar xzf -              \
+ && pip install --user -r requirements.txt
 
 
 # Use debian buster (10)
@@ -41,9 +29,8 @@ ENV PATH $ACE_DIR:$PATH
 # Install dependencies and acestream engine
 RUN apt-get -q update                          \
  && apt-get install -y --no-install-recommends \
-        libpython2.7                           \
-        python-minimal                         \
-        libxslt1.1                             \
+        libpython3.7                           \
+        python3.7-minimal                      \
         libsqlite3-0                           \
         netcat                                 \
         net-tools                              \
@@ -51,9 +38,12 @@ RUN apt-get -q update                          \
  && rm -rf /var/lib/apt/lists/*                \
           /var/cache/*
 
-COPY --from=build /usr/local/lib/python2.7/site-packages/pkg_resources /usr/lib/python2.7/dist-packages/pkg_resources
-COPY --from=build /root/.local/lib/python2.7/site-packages /usr/lib/python2.7/dist-packages
+COPY --from=build /usr/local/lib/python3.7/site-packages/pkg_resources /usr/lib/python3.7/dist-packages/pkg_resources
+COPY --from=build /root/.local/lib/python3.7/site-packages /usr/lib/python3.7/dist-packages
 COPY --from=build $ACE_DIR $ACE_DIR
+
+# Set python 3.7 as default
+RUN update-alternatives --install /usr/bin/python python /usr/bin/python3.7 0
 
 # Copy entrypoint scripts
 COPY ./print_token.py /
